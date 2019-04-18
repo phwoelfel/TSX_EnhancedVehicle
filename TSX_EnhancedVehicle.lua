@@ -274,6 +274,7 @@ function TSX_EnhancedVehicle:activateConfig()
   TSX_EnhancedVehicle.showKeysInHelpMenu  = lC:getConfigValue("global.misc", "showKeysInHelpMenu")
   TSX_EnhancedVehicle.soundIsOn           = lC:getConfigValue("global.misc", "soundIsOn")
   TSX_EnhancedVehicle.shuttleDefaultIsOn  = lC:getConfigValue("global.misc", "shuttleDefaultIsOn")
+  TSX_EnhancedVehicle.tempInFahrenheit    = lC:getConfigValue("global.misc", "tempInFahrenheit")
 
   -- HUD stuff
   for _, section in pairs(TSX_EnhancedVehicle.sections) do
@@ -343,6 +344,7 @@ function TSX_EnhancedVehicle:resetConfig(disable)
   lC:addConfigValue("global.misc", "showKeysInHelpMenu", "bool",   true)
   lC:addConfigValue("global.misc", "soundIsOn", "bool",            true)
   lC:addConfigValue("global.misc", "shuttleDefaultIsOn", "bool",   false)
+  lC:addConfigValue("global.misc", "tempInFahrenheit", "bool",   false)
 
   -- fuel
   if g_currentMission.inGameMenu.hud.speedMeter.fuelGaugeIconElement ~= nil then
@@ -868,9 +870,17 @@ function TSX_EnhancedVehicle:onDraw()
     -- ### do the temperature stuff ###
     if self.spec_motorized ~= nil and TSX_EnhancedVehicle.temp.enabled and self.isServer then
       -- prepare text
-      temp_txt = "--\n°C"
+      if TSX_EnhancedVehicle.tempInFahrenheit then
+        temp_txt = "--\n°F"
+      else
+        temp_txt = "--\n°C"
+      end
       if self.spec_motorized.isMotorStarted == true then
-        temp_txt = string.format("%i\n°C", self.spec_motorized.motorTemperature.value)
+        if TSX_EnhancedVehicle.tempInFahrenheit then
+          temp_txt = string.format("%i\n°F", self.spec_motorized.motorTemperature.value*1.8+32)
+        else
+          temp_txt = string.format("%i\n°C", self.spec_motorized.motorTemperature.value)
+        end
       end
 
       -- render text
